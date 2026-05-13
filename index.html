@@ -130,4 +130,15 @@ db.ref("game").on("value", snap => {
 
 </body>
 </html>
-``
+``function move(name, val){
+
+ // mise à jour score
+ db.ref("game/" + name).transaction(v => (v || 0) + val);
+
+ // 🔥 AJOUT : LOG ACTION
+ db.ref("actions").push({
+   agent: name,
+   value: val,
+   time: new Date().toLocaleTimeString()
+ });
+}
