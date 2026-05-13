@@ -11,9 +11,9 @@
 body { font-family: Arial; background:#0d0d0d; color:white; text-align:center }
 .card { background:#1e1e1e; padding:15px; margin:10px; border-radius:12px }
 .gold { border:3px solid gold }
-.track { background:#333; height:30px; border-radius:20px; position:relative; margin-top:10px }
+.track { background:#333; height:35px; border-radius:20px; position:relative; margin-top:10px }
 .kart { position:absolute; top:2px; font-size:24px; transition:0.4s }
-.rules { background:#222; padding:15px; border-radius:10px; margin:15px auto; width:80%; text-align:left }
+.rules { background:#222; padding:12px; margin:15px auto; width:80%; border-radius:10px }
 .leader { background:gold; color:black; padding:10px; margin:10px; border-radius:10px }
 </style>
 
@@ -46,12 +46,14 @@ const agents = [
  {name:"Thierry Yansounou", kart:"🚓"}
 ];
 
+
+// ✅ MOVE + TRACKING
 function move(name, val){
 
- // ✅ met à jour le score
+ // score
  db.ref("game/"+name).transaction(v => (v || 0) + val);
 
- // 🔥 ajoute le suivi (LOG)
+ // 🔥 tracking action
  db.ref("actions").push({
    agent: name,
    value: val,
@@ -60,6 +62,7 @@ function move(name, val){
 }
 
 
+// ✅ RENDER
 function render(data){
 
  const players = agents.map(a => ({
@@ -81,26 +84,22 @@ function render(data){
  }
 
  let html = `
- <h1>🏁 Mario Kart CHALLENGE</h1>
+ <h1>🏁 Mario Kart Challenge</h1>
 
  ${leaderBox}
  ${winner}
 
  <div class="rules">
-   <h3>📜 Comment jouer ?</h3>
+   ⚙️ +100 = Option<br>
+   📱 +200 = Mobile<br>
+   🏆 +300 = Win<br>
+   🟢 +50 = Bonus<br>
+   🔴 -100 = Erreur<br><br>
 
-   ✅ Chaque bouton correspond à une action réelle<br><br>
-
-   ⚙️ +100 = Option vendue<br>
-   📱 +200 = Activation mobile<br>
-   🏆 +300 = Activation WIN<br>
-   🟢 +50 = Bon NPS client<br>
-   🔴 -100 = Mauvais NPS<br><br>
-
-   🎯 Objectif : atteindre 2000 points pour gagner 🏁
+   🎯 Objectif : 2000 points
  </div>
 
- <h2>🏆 Classement</h2>
+ <h2>Classement</h2>
  ${sorted.map((p,i)=>`<div>${i+1}. ${p.name} (${p.pos})</div>`).join("")}
 
  <hr/>
@@ -132,6 +131,8 @@ function render(data){
  document.getElementById("app").innerHTML = html;
 }
 
+
+// ✅ LIVE GAME
 db.ref("game").on("value", snap => {
  render(snap.val() || {});
 });
@@ -140,4 +141,3 @@ db.ref("game").on("value", snap => {
 
 </body>
 </html>
-``
