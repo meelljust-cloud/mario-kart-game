@@ -15,11 +15,23 @@ body { font-family: Arial; background:#0d0d0d; color:white; text-align:center }
 .kart { position:absolute; top:2px; font-size:24px; transition:0.4s }
 .rules { background:#222; padding:12px; margin:15px auto; width:80%; border-radius:10px }
 .leader { background:gold; color:black; padding:10px; margin:10px; border-radius:10px }
+select { padding:8px; margin:10px; border-radius:8px }
 </style>
 
 </head>
 
 <body>
+
+<h2>👤 Choisis ton nom</h2>
+
+<select id="userSelect">
+  <option value="">-- Choisis ton nom --</option>
+  <option>Beatriz Gomes</option>
+  <option>Malorie Ghyselinck</option>
+  <option>Nelson Mendes</option>
+  <option>Sylvia Sylva</option>
+  <option>Thierry Yansounou</option>
+</select>
 
 <div id="app">Chargement...</div>
 
@@ -37,6 +49,12 @@ const db = firebase.database();
 
 const FINISH = 2000;
 let currentLeader = null;
+let currentUser = "";
+
+// 👤 récupération utilisateur
+document.getElementById("userSelect").addEventListener("change", (e)=>{
+  currentUser = e.target.value;
+});
 
 const agents = [
  {name:"Beatriz Gomes", kart:"🏎️"},
@@ -46,14 +64,19 @@ const agents = [
  {name:"Thierry Yansounou", kart:"🚓"}
 ];
 
-
-// ✅ MOVE + TRACKING
+// ✅ ACTION (protégée)
 function move(name, val){
 
- // score
+ // 🚫 empêche de jouer pour quelqu’un d’autre
+ if(name !== currentUser){
+   alert("⛔ Tu ne peux jouer que pour toi !");
+   return;
+ }
+
+ // ✅ score
  db.ref("game/"+name).transaction(v => (v || 0) + val);
 
- // 🔥 tracking action
+ // ✅ tracking
  db.ref("actions").push({
    agent: name,
    value: val,
@@ -95,7 +118,6 @@ function render(data){
    🏆 +300 = Win<br>
    🟢 +50 = Bonus<br>
    🔴 -100 = Erreur<br><br>
-
    🎯 Objectif : 2000 points
  </div>
 
@@ -112,11 +134,18 @@ function render(data){
      <strong>${p.kart} ${p.name}</strong><br>
      Score: ${p.pos}<br><br>
 
-     <button onclick="move('${p.name}',100)">⚙️ +100</button>
-     <button onclick="move('${p.name}',200)">📱 +200</button>
-     <button onclick="move('${p.name}',300)">🏆 +300</button>
-     <button onclick="move('${p.name}',50)">🟢 +50</button>
-     <button onclick="move('${p.name}',-100)">🔴 -100</button>
+     ${
+       p.name === currentUser ?
+       `
+       <button onclick="move('${p.name}',100)">⚙️ +100</button>
+       <button onclick="move('${p.name}',200)">📱 +200</button>
+       <button onclick="move('${p.name}',300)">🏆 +300</button>
+       <button onclick="move('${p.name}',50)">🟢 +50</button>
+       <button onclick="move('${p.name}',-100)">🔴 -100</button>
+       `
+       :
+       `<div style="opacity:0.3">🔒 Actions verrouillées</div>`
+     }
 
      <div class="track">
        <div class="kart" style="left:${(p.pos/FINISH)*100}%">
@@ -132,7 +161,7 @@ function render(data){
 }
 
 
-// ✅ LIVE GAME
+// ✅ LIVE
 db.ref("game").on("value", snap => {
  render(snap.val() || {});
 });
