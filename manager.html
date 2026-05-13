@@ -31,7 +31,24 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+function resetGame(){
 
+ const freshStart = {
+  "Beatriz Gomes": 0,
+  "Malorie Ghyselinck": 0,
+  "Nelson Mendes": 0,
+  "Sylvia Sylva": 0,
+  "Thierry Yansounou": 0
+ };
+
+ // reset scores
+ db.ref("game").set(freshStart);
+
+ // reset actions (historique)
+ db.ref("actions").set(null);
+
+ alert("✅ Nouvelle course lancée !");
+}
 // 📊 SCORES
 db.ref("game").on("value", snap => {
  const data = snap.val() || {};
