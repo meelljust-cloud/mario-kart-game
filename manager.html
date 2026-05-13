@@ -8,20 +8,51 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <style>
-body { font-family: Arial; background:#111; color:white; text-align:center }
-.card { background:#1e1e1e; padding:15px; margin:10px; border-radius:10px }
+body {
+ font-family: Arial;
+ background:#111;
+ color:white;
+ text-align:center;
+}
+
+.card {
+ background:#1e1e1e;
+ padding:12px;
+ margin:8px;
+ border-radius:10px;
+}
+
+button {
+ padding:10px;
+ margin:10px;
+ border:none;
+ border-radius:8px;
+ font-size:15px;
+ cursor:pointer;
+}
+
+.reset {
+ background:red;
+ color:white;
+ font-weight:bold;
+}
+
 </style>
 
 </head>
+
 <body>
 
 <h1>📊 Dashboard Manager</h1>
+
+<button class="reset" onclick="confirmReset()">🧨 Reset Course</button>
 
 <div id="stats"></div>
 <div id="actions"></div>
 
 <script>
 
+// ✅ CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDybWbfjdDCwE4y8FmaAMd06fncMhI3A",
   authDomain: "mario-kart-f2dc5.firebaseapp.com",
@@ -31,9 +62,20 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+
+// ✅ RESET AVEC CONFIRMATION
+function confirmReset(){
+ if(confirm("⚠️ Tu es sûr de vouloir recommencer la course ?")){
+   resetGame();
+ }
+}
+
+
+// ✅ RESET TOTAL
 function resetGame(){
 
- const freshStart = {
+ const freshData = {
   "Beatriz Gomes": 0,
   "Malorie Ghyselinck": 0,
   "Nelson Mendes": 0,
@@ -42,15 +84,18 @@ function resetGame(){
  };
 
  // reset scores
- db.ref("game").set(freshStart);
+ db.ref("game").set(freshData);
 
- // reset actions (historique)
+ // reset historique
  db.ref("actions").set(null);
 
  alert("✅ Nouvelle course lancée !");
 }
-// 📊 SCORES
+
+
+// ✅ SCORES LIVE
 db.ref("game").on("value", snap => {
+
  const data = snap.val() || {};
 
  let html = "<h2>🏆 Scores</h2>";
@@ -60,27 +105,28 @@ db.ref("game").on("value", snap => {
  });
 
  document.getElementById("stats").innerHTML = html;
+
 });
 
 
-// 📈 ACTIVITÉ
+// ✅ ACTIVITÉ LIVE
 db.ref("actions").limitToLast(20).on("value", snap => {
- const data = snap.val() || {};
 
- let html = "<h2>📊 Activité récente</h2>";
+ const data = snap.val() || {};
+ let html = "<h2>📈 Activité récente</h2>";
 
  Object.values(data).reverse().forEach(a => {
    html += `
    <div class="card">
-     ${a.time} — ${a.agent} → ${a.value > 0 ? "+" : ""}${a.value}
+     ${a.time} - ${a.agent} → ${a.value > 0 ? "+" : ""}${a.value}
    </div>`;
  });
 
  document.getElementById("actions").innerHTML = html;
+
 });
 
 </script>
 
 </body>
 </html>
-``
