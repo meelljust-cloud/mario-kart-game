@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mario Kart LIVE</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<style>
+body { font-family: Arial; background:#0d0d0d; color:white; text-align:center }
+.card { background:#1e1e1e; padding:15px; margin:10px; border-radius:12px }
+.gold { border:3px solid gold }
+.track { background:#333; height:30px; border-radius:20px; position:relative; margin-top:10px }
+.kart { position:absolute; top:2px; font-size:24px; transition:0.4s }
+.rules { background:#222; padding:15px; border-radius:10px; margin:15px auto; width:80%; text-align:left }
+.leader { background:gold; color:black; padding:10px; margin:10px; border-radius:10px }
+</style>
+
+</head>
+
+<body>
+
+<div id="app">Chargement...</div>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDybWbfjdDCwE4y8FmaAMd06fncMhI3A",
+  authDomain: "mario-kart-f2dc5.firebaseapp.com",
+  projectId: "mario-kart-f2dc5",
+  databaseURL: "https://mario-kart-f2dc5-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const FINISH = 2000;
+let currentLeader = null;
+
+const agents = [
+ {name:"Beatriz Gomes", kart:"🏎️"},
+ {name:"Malorie Ghyselinck", kart:"🚗"},
+ {name:"Nelson Mendes", kart:"🚙"},
+ {name:"Sylvia Sylva", kart:"🚕"},
+ {name:"Thierry Yansounou", kart:"🚓"}
+];
+
+function move(name, val){
+ db.ref("game/"+name).transaction(v => (v || 0) + val);
+}
+
+function render(data){
+
+ const players = agents.map(a => ({
+   ...a,
+   pos: data[a.name] || 0
+ }));
+
+ const sorted = [...players].sort((a,b)=>b.pos-a.pos);
+
+ let leaderBox = "";
+ if(currentLeader && currentLeader !== sorted[0].name){
+   leaderBox = `<div class="leader">🎉 Nouveau leader : ${sorted[0].name}</div>`;
+ }
+ currentLeader = sorted[0].name;
+
+ let winner = "";
+ if(sorted[0].pos >= FINISH){
+   winner = `<h2>🏆 ${sorted[0].name} a gagné !!</h2>`;
+ }
+
+ let html = `
+ <h1>🏁 Mario Kart CHALLENGE</h1>
+
+ ${leaderBox}
+ ${winner}
+
+ <div class="rules">
+   <h3>📜 Comment jouer ?</h3>
+
+   ✅ Chaque bouton correspond à une action réelle<br><br>
+
+   ⚙️ +100 = Option vendue<br>
+   📱 +200 = Activation mobile<br>
+   🏆 +300 = Activation réussie<br>
+   🟢 +50 = Bon feedback client<br>
+   🔴 -100 = Mauvais feedback<br><br>
+
+   🎯 Objectif : atteindre 2000 points pour gagner 🏁
+ </div>
+
+ <h2>🏆 Classement</h2>
+ ${sorted.map((p,i)=>`<div>${i+1}. ${p.name} (${p.pos})</div>`).join("")}
+
+ <hr/>
+ `;
+
+ players.forEach(p => {
+
+   html += `
+   <div class="card ${p.name === currentLeader ? "gold":""}">
+     <strong>${p.kart} ${p.name}</strong><br>
+     Score: ${p.pos}<br><br>
+
+     <button onclick="move('${p.name}',100)">⚙️ +100</button>
+     <button onclick="move('${p.name}',200)">📱 +200</button>
+     <button onclick="move('${p.name}',300)">🏆 +300</button>
+     <button onclick="move('${p.name}',50)">🟢 +50</button>
+     <button onclick="move('${p.name}',-100)">🔴 -100</button>
+
+     <div class="track">
+       <div class="kart" style="left:${(p.pos/FINISH)*100}%">
+         ${p.kart}
+       </div>
+     </div>
+
+   </div>
+   `;
+ });
+
+ document.getElementById("app").innerHTML = html;
+}
+
+db.ref("game").on("value", snap => {
+ render(snap.val() || {});
+});
+
+</script>
+
+</body>
+</html>
+``
