@@ -33,10 +33,13 @@ select { padding:8px; margin:10px; border-radius:8px }
   <option>Thierry Yansounou</option>
 </select>
 
+<div id="welcome"></div>
+
 <div id="app">Chargement...</div>
 
 <script>
 
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDybWbfjdDCwE4y8FmaAMd06fncMhI3A",
   authDomain: "mario-kart-f2dc5.firebaseapp.com",
@@ -51,11 +54,7 @@ const FINISH = 2000;
 let currentLeader = null;
 let currentUser = "";
 
-// 👤 récupération utilisateur
-document.getElementById("userSelect").addEventListener("change", (e)=>{
-  currentUser = e.target.value;
-});
-
+// AGENTS
 const agents = [
  {name:"Beatriz Gomes", kart:"🏎️"},
  {name:"Malorie Ghyselinck", kart:"🚗"},
@@ -64,19 +63,30 @@ const agents = [
  {name:"Thierry Yansounou", kart:"🚓"}
 ];
 
-// ✅ ACTION (protégée)
+// 👤 sélection utilisateur + REFRESH FIX ✅
+document.getElementById("userSelect").addEventListener("change", (e)=>{
+  currentUser = e.target.value;
+
+  document.getElementById("welcome").innerHTML =
+    "👋 Bonjour " + currentUser;
+
+  // 🔥 FIX : re-render immédiat
+  db.ref("game").once("value").then(snapshot => {
+    render(snapshot.val() || {});
+  });
+});
+
+
+// ACTION SÉCURISÉE
 function move(name, val){
 
- // 🚫 empêche de jouer pour quelqu’un d’autre
  if(name !== currentUser){
    alert("⛔ Tu ne peux jouer que pour toi !");
    return;
  }
 
- // ✅ score
  db.ref("game/"+name).transaction(v => (v || 0) + val);
 
- // ✅ tracking
  db.ref("actions").push({
    agent: name,
    value: val,
@@ -85,7 +95,7 @@ function move(name, val){
 }
 
 
-// ✅ RENDER
+// RENDER
 function render(data){
 
  const players = agents.map(a => ({
@@ -161,7 +171,7 @@ function render(data){
 }
 
 
-// ✅ LIVE
+// LIVE UPDATE
 db.ref("game").on("value", snap => {
  render(snap.val() || {});
 });
@@ -170,3 +180,4 @@ db.ref("game").on("value", snap => {
 
 </body>
 </html>
+``
