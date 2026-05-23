@@ -31,6 +31,13 @@ select { padding:8px; margin:10px; border-radius:8px }
   <option>Nelson Mendes</option>
   <option>Sylvia Sylva</option>
   <option>Thierry Yansounou</option>
+
+  <!-- NOUVEAUX -->
+  <option>Nicolas Catherine-Duchemin</option>
+  <option>Hicham Abourouh</option>
+  <option>Brayan Mercier</option>
+  <option>Vincent Fevry</option>
+  <option>Marc Monteiro</option>
 </select>
 
 <div id="welcome"></div>
@@ -54,30 +61,35 @@ const FINISH = 2000;
 let currentLeader = null;
 let currentUser = "";
 
-// AGENTS
+// AGENTS (✅ AJOUTÉS)
 const agents = [
  {name:"Beatriz Gomes", kart:"🏎️"},
  {name:"Malorie Ghyselinck", kart:"🚗"},
  {name:"Nelson Mendes", kart:"🚙"},
  {name:"Sylvia Sylva", kart:"🚕"},
- {name:"Thierry Yansounou", kart:"🚓"}
+ {name:"Thierry Yansounou", kart:"🚓"},
+
+ // nouveaux agents
+ {name:"Nicolas Catherine-Duchemin", kart:"🚘"},
+ {name:"Hicham Abourouh", kart:"🏁"},
+ {name:"Brayan Mercier", kart:"🚖"},
+ {name:"Vincent Fevry", kart:"🚔"},
+ {name:"Marc Monteiro", kart:"🚍"}
 ];
 
-// 👤 sélection utilisateur + REFRESH FIX ✅
+// 👤 sélection utilisateur
 document.getElementById("userSelect").addEventListener("change", (e)=>{
   currentUser = e.target.value;
 
   document.getElementById("welcome").innerHTML =
     "👋 Bonjour " + currentUser;
 
-  // 🔥 FIX : re-render immédiat
   db.ref("game").once("value").then(snapshot => {
     render(snapshot.val() || {});
   });
 });
 
-
-// ACTION SÉCURISÉE
+// ACTION
 function move(name, val){
 
  if(name !== currentUser){
@@ -93,7 +105,6 @@ function move(name, val){
    time: new Date().toLocaleTimeString()
  });
 }
-
 
 // RENDER
 function render(data){
@@ -170,7 +181,6 @@ function render(data){
  document.getElementById("app").innerHTML = html;
 }
 
-
 // LIVE UPDATE
 db.ref("game").on("value", snap => {
  render(snap.val() || {});
@@ -180,4 +190,3 @@ db.ref("game").on("value", snap => {
 
 </body>
 </html>
-``
