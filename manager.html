@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Manager</title>
+<title>Dashboard Manager PRO</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -11,15 +10,38 @@
 <style>
 body {
  font-family: Arial;
- background:#111;
+ background:#0d0d0d;
  color:white;
  text-align:center;
+}
+
+h1 {
+ color:gold;
 }
 
 .card {
  background:#1e1e1e;
  padding:12px;
  margin:8px;
+ border-radius:10px;
+}
+
+.leader {
+ background: gold;
+ color:black;
+ font-weight:bold;
+}
+
+.track {
+ background:#333;
+ height:20px;
+ border-radius:10px;
+ margin-top:5px;
+}
+
+.kart {
+ height:100%;
+ background:limegreen;
  border-radius:10px;
 }
 
@@ -37,6 +59,11 @@ button {
  color:white;
  font-weight:bold;
 }
+
+.clear {
+ background:orange;
+ color:black;
+}
 </style>
 
 </head>
@@ -46,6 +73,7 @@ button {
 <h1>📊 Dashboard Manager</h1>
 
 <button class="reset" onclick="confirmReset()">🧨 Reset Course</button>
+<button class="clear" onclick="clearActions()">🧹 Clear Actions</button>
 
 <div id="stats"></div>
 <div id="actions"></div>
@@ -63,16 +91,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+const FINISH = 2000;
 
-// ✅ RESET AVEC CONFIRMATION
+// ✅ RESET
 function confirmReset(){
- if(confirm("⚠️ Tu es sûr de vouloir recommencer la course ?")){
+ if(confirm("⚠️ Reset complet de la course ?")){
    resetGame();
  }
 }
 
-
-// ✅ RESET TOTAL (✅ AJOUT DES NOUVEAUX AGENTS)
+// ✅ RESET COURSE
 function resetGame(){
 
  const freshData = {
@@ -85,34 +113,60 @@ function resetGame(){
   "Hicham Abourouh": 0,
   "Brayan Mercier": 0,
   "Vincent Fevry": 0,
-  "Marc Monteiro": 0
+  "Marc Monteiro": 0,
+  "Marie Audouin": 0,
+  "Mounira Oudad": 0,
+  "Henrique Oliveira": 0,
+  "Lucas Launay": 0
  };
 
- // reset scores
  db.ref("game").set(freshData);
-
- // reset historique
  db.ref("actions").set(null);
 
- alert("✅ Nouvelle course lancée !");
+ alert("✅ Nouvelle course !");
 }
 
+// ✅ CLEAR ACTIONS
+function clearActions(){
+ if(confirm("Supprimer l'historique ?")){
+   db.ref("actions").set(null);
+ }
+}
 
 // ✅ SCORES LIVE
 db.ref("game").on("value", snap => {
 
  const data = snap.val() || {};
 
- let html = "<h2>🏆 Scores</h2>";
+ const players = Object.keys(data).map(name => ({
+   name,
+   score: data[name]
+ }));
 
- Object.keys(data).forEach(name=>{
-   html += `<div class="card">${name} : ${data[name]}</div>`;
+ // ✅ TRI CLASSEMENT
+ players.sort((a,b)=>b.score-a.score);
+
+ let html = "<h2>🏆 Classement</h2>";
+
+ players.forEach((p,i)=>{
+
+   const percent = Math.min((p.score / FINISH) * 100, 100);
+
+   html += `
+   <div class="card ${i===0 ? "leader":""}">
+     ${i+1}. ${p.name} → ${p.score}
+
+     <div class="track">
+       <div class="kart" style="width:${percent}%"></div>
+     </div>
+
+   </div>
+   `;
  });
 
  document.getElementById("stats").innerHTML = html;
 
 });
-
 
 // ✅ ACTIVITÉ LIVE
 db.ref("actions").limitToLast(20).on("value", snap => {
@@ -135,3 +189,4 @@ db.ref("actions").limitToLast(20).on("value", snap => {
 
 </body>
 </html>
+``
