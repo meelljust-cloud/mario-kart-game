@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Mario Kart LIVE</title>
 
+<!-- ✅ Firebase (corrigé) -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
@@ -26,6 +27,7 @@ select { padding:8px; margin:10px; border-radius:8px }
 
 <select id="userSelect">
   <option value="">-- Choisis ton nom --</option>
+
   <option>Beatriz Gomes</option>
   <option>Malorie Ghyselinck</option>
   <option>Nelson Mendes</option>
@@ -37,6 +39,7 @@ select { padding:8px; margin:10px; border-radius:8px }
   <option>Vincent Fevry</option>
   <option>Marc Monteiro</option>
 
+  <!-- ✅ NOUVEAUX -->
   <option>Marie Audouin</option>
   <option>Mounira Oudad</option>
   <option>Henrique Oliveira</option>
@@ -48,7 +51,7 @@ select { padding:8px; margin:10px; border-radius:8px }
 
 <script>
 
-// CONFIG
+// ✅ CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyDybWbfjdDCwE4y8FmaAMd06fncMhI3A",
   authDomain: "mario-kart-f2dc5.firebaseapp.com",
@@ -59,11 +62,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ✅ GAME SETTINGS
 const FINISH = 2000;
 let currentLeader = null;
 let currentUser = "";
 
-// ✅ UNIQUEMENT VOITURES
+// ✅ JOUEURS (UNIQUEMENT VOITURES)
 const agents = [
  {name:"Beatriz Gomes", kart:"🏎️"},
  {name:"Malorie Ghyselinck", kart:"🚗"},
@@ -75,13 +79,14 @@ const agents = [
  {name:"Brayan Mercier", kart:"🚖"},
  {name:"Vincent Fevry", kart:"🚗"},
  {name:"Marc Monteiro", kart:"🚙"},
+
  {name:"Marie Audouin", kart:"🚕"},
  {name:"Mounira Oudad", kart:"🚗"},
  {name:"Henrique Oliveira", kart:"🚓"},
  {name:"Lucas Launay", kart:"🚙"}
 ];
 
-// 👤 sélection utilisateur
+// ✅ SELECT USER
 document.getElementById("userSelect").addEventListener("change", (e)=>{
   currentUser = e.target.value;
 
@@ -93,7 +98,7 @@ document.getElementById("userSelect").addEventListener("change", (e)=>{
   });
 });
 
-// ACTION
+// ✅ ACTION
 function move(name, val){
 
  if(name !== currentUser){
@@ -110,7 +115,7 @@ function move(name, val){
  });
 }
 
-// RENDER
+// ✅ RENDER
 function render(data){
 
  const players = agents.map(a => ({
@@ -185,11 +190,13 @@ function render(data){
  document.getElementById("app").innerHTML = html;
 }
 
-// LIVE UPDATE
+// ✅ LIVE UPDATE
 db.ref("game").on("value", snap => {
  render(snap.val() || {});
 });
 
 </script>
+
 </body>
 </html>
+``
