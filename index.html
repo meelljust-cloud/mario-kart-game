@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,10 +36,14 @@ select { padding:8px; margin:10px; border-radius:8px }
   <option>Brayan Mercier</option>
   <option>Vincent Fevry</option>
   <option>Marc Monteiro</option>
+
+  <option>Marie Audouin</option>
+  <option>Mounira Oudad</option>
+  <option>Henrique Oliveira</option>
+  <option>Lucas Launay</option>
 </select>
 
 <div id="welcome"></div>
-
 <div id="app">Chargement...</div>
 
 <script>
@@ -60,7 +63,7 @@ const FINISH = 2000;
 let currentLeader = null;
 let currentUser = "";
 
-// AGENTS (✅ AJOUTÉS)
+// ✅ UNIQUEMENT VOITURES
 const agents = [
  {name:"Beatriz Gomes", kart:"🏎️"},
  {name:"Malorie Ghyselinck", kart:"🚗"},
@@ -68,10 +71,14 @@ const agents = [
  {name:"Sylvia Sylva", kart:"🚕"},
  {name:"Thierry Yansounou", kart:"🚓"},
  {name:"Nicolas Catherine-Duchemin", kart:"🚘"},
- {name:"Hicham Abourouh", kart:"🏁"},
+ {name:"Hicham Abourouh", kart:"🚔"},
  {name:"Brayan Mercier", kart:"🚖"},
- {name:"Vincent Fevry", kart:"🚔"},
- {name:"Marc Monteiro", kart:"🚍"}
+ {name:"Vincent Fevry", kart:"🚗"},
+ {name:"Marc Monteiro", kart:"🚙"},
+ {name:"Marie Audouin", kart:"🚕"},
+ {name:"Mounira Oudad", kart:"🚗"},
+ {name:"Henrique Oliveira", kart:"🚓"},
+ {name:"Lucas Launay", kart:"🚙"}
 ];
 
 // 👤 sélection utilisateur
@@ -184,3 +191,5 @@ db.ref("game").on("value", snap => {
 });
 
 </script>
+</body>
+</html>
